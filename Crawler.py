@@ -2,8 +2,9 @@ import json
 import requests
 from bs4 import BeautifulSoup
 # bas url 
-first_url = "https://stackoverflow.com/questions"
-
+first_url = "https://hackr.io/"
+links = []
+course = []
 # data fatching function
 def featch(url):
     try:
@@ -14,21 +15,15 @@ def featch(url):
         print('Give URL : "%s" is not available!' % url)
     #parse content
     content = BeautifulSoup(response.text, 'html.parser')
-    # extract question content
-    description = content.findAll('div', {'class' : 'excerpt'})
     # extract question description
-    links = content.findAll('a', {'class' : 'question-hyperlink'})
+    link = content.find_all('a', {'class' : 'topic-grid-item'})
+    for i in link:
+        links.append(i['href'])
 
-    #print(len(links), len(description))
-    # loop over stack overflows question list
-    for index in range(0, len(description)):
-        # storing data
-        question = {
-            'title': links[index].text,
-            'url' : links[index]['href'],
-            'description' : description[index].text.strip().replace('\n', '')
-        }
-        #print data in json format
-        print(json.dumps(question, indent = 2))
+    r = requests.get(links[0])
+    soup = BeautifulSoup(r.content, 'html.parser')
+    data = soup.find("script").find_all("mainEntity")
+    print(data)
 
 featch(first_url)
+#print(links)
